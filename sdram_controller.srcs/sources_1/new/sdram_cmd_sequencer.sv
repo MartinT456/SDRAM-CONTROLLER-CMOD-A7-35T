@@ -8,15 +8,53 @@
 // Project Name: 
 // Target Devices: 
 // Tool Versions: 
+
 // Description: 
-// 
-// Dependencies: 
-// 
-// Revision:
-// Revision 0.01 - File Created
-// Additional Comments:
-// 
-//////////////////////////////////////////////////////////////////////////////////
+// This module generates a sequence of commands to interface with a
+// synchronous DRAM (SDRAM) device, specifically the Micron
+// MT48LC16M16A2P-6A:G. It accepts an address and a read/write request,
+// and produces the corresponding SDRAM control commands for
+// activating a row, performing read/write operations, and precharging.
+//
+// The input address is split according to the SDRAM's organization:
+//   - Row Address   : bits [24:12]
+//   - Column Address: bits [11:3]
+//   - Bank Address  : bits [2:1]
+//   - A10/AP Bit    : bit [0]
+//
+// Command sequencing follows:
+//   IDLE -> ACTIVE -> READ/WRITE -> PRECHARGE -> IDLE
+//
+// All SDRAM command encodings conform to Micron's truth table (Table 14).
+//
+// Inputs:
+//   clk         : Clock input
+//   reset_n     : Active-low reset
+//   cmd_req     : External request to issue a memory operation
+//   addr        : 25-bit SDRAM address (row/col/bank/A10)
+//   rw_mode     : 1 = read, 0 = write
+//   burst_len   : Burst length (not yet implemented)
+//
+// Outputs:
+//   sdram_cmd   : 4-bit command code for SDRAM control signals
+//   sdram_addr  : 13-bit address to send to SDRAM (row or column)
+//   sdram_ba    : 2-bit bank address
+//   a10_ap      : Auto-precharge bit (passed through for column access)
+//
+// Inouts:
+//   sdram_dq    : 16-bit bidirectional data bus (not driven in this module)
+//
+//----------------------------------------------------------------------
+// Notes:
+// - This module does not implement timing constraints (tRCD, tRP, etc.)
+// - No handling of data I/O yet (sdram_dq is unused here)
+// - Burst length and refresh logic not included in this version
+//
+//----------------------------------------------------------------------
+// Revision History:
+//   [v1.0] - Initial version with basic command sequencing
+//
+//======================================================================
 
 
 module sdram_cmd_sequencer(
