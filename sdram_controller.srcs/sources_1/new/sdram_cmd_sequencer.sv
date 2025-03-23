@@ -142,7 +142,7 @@ module sdram_cmd_sequencer(
             end
             READ_WRITE: begin
                 sdram_cmd  = rw_mode ? CMD_READ : CMD_WRITE;
-                sdram_addr = {4'b0000, col_addr}; // Column Address (Fixed!)
+                sdram_addr = {4'b0000, col_addr}; // Column Address
                 sdram_ba   = bank_addr;
                 a10_ap     = addr[0]; // Auto-precharge control
             end
