@@ -1,0 +1,14 @@
+Time resolution is 1 ps
+Starting SDRAM Data IO Testbench
+
+[Test] Write Burst
+[Pass] Write burst complete
+
+[Test] Read Burst
+Read data = 7b0d
+Read data = 998d
+Read data = 8465
+[Pass] Read burst complete
+
+All tests complete.
+$stop called at time : 135 ns : File "F:/FPGA_Repos/sdram_controller/sdram_controller.srcs/sim_1/new/sdram_data_io_tb.sv" Line 136

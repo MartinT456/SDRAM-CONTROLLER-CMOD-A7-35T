@@ -1,7 +1,6 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
+// Written by: Martin Tran
 // 
 // Create Date: 03/23/2025
 // Design Name: 
@@ -10,12 +9,54 @@
 // Target Devices: 
 // Tool Versions: 
 // Description: 
+//
+// This testbench is designed to verify the functionality of the `sdram_data_io`
+// module. It simulates both write and read burst operations, and ensures the correct
+// handling of the data bus (`sdram_dq`). The testbench generates a clock, applies
+// a reset, and initiates various read and write burst operations.
+//
+// It also provides stimulus for both `write_enable` and `read_enable` signals, and
+// verifies that the correct data is written to or read from the `sdram_dq` bus. 
+// The `burst_done` signal is checked at the end of each burst to confirm that
+// the burst operation has completed successfully.
+//
+// The testbench also includes:
+// - A clock generator
+// - Reset signal management
+// - Generation of random data for write operations
+// - Simulation of SDRAM driving the `sdram_dq` bus during read bursts
+// - Displaying of read and write data values for verification
+//
+//------------------------------------------------------------------------------
+// Test Features:
+// - Clock generation with 100 MHz frequency (CLK_PERIOD = 10ns)
+// - Write and read burst tests with configurable burst length (BURST_LEN = 4)
+// - Verifies correct operation of `write_enable`, `read_enable`, and `burst_done`
+// - Simulates SDRAM driving data onto `sdram_dq` during read operations
+// - Displays read and write data values during simulation for validation
+//
+//------------------------------------------------------------------------------
+// Ports:
+// Inputs:
+//   - clk           : Clock signal
+//   - reset_n       : Active-low reset signal
+//   - burst_start   : Initiates a new burst transfer (1 cycle active)
+//   - rw_mode       : Read (1) or write (0) mode for the burst
+//   - burst_len     : Length of the burst in terms of 16-bit words
+//   - write_enable  : Enables writing data to SDRAM during write burst
+//   - write_data    : Data to be written to SDRAM during write bursts
+//   - read_enable   : Enables reading from SDRAM during read burst
+//   - sdram_dq_driver : Simulates data driven by SDRAM during read operations
+//   - sdram_dq_drive_en : Enables SDRAM drive onto the `sdram_dq` bus
+//
+// Outputs:
+//   - read_data     : Captured data from SDRAM during read bursts
+//   - read_valid    : Indicates when `read_data` is valid and should be captured
+//   - burst_done    : Indicates when the burst operation is complete
+//   - sdram_dq      : Bidirectional data bus between FPGA and SDRAM 
 // 
-// Dependencies: 
-// 
-// Revision:
-// Revision 0.01 - File Created
-// Additional Comments:
+// Revision History:
+//   [v1.0] - Initial version, designed to verify basic read and write burst functionality
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
