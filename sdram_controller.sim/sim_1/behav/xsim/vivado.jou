@@ -1,0 +1,24 @@
+#-----------------------------------------------------------
+# Vivado v2024.2 (64-bit)
+# SW Build 5239630 on Fri Nov 08 22:35:27 MST 2024
+# IP Build 5239520 on Sun Nov 10 16:12:51 MST 2024
+# SharedData Build 5239561 on Fri Nov 08 14:39:27 MST 2024
+# Start of session at: Mon Mar 24 10:18:04 2025
+# Process ID         : 16808
+# Current directory  : F:/FPGA_Repos/sdram_controller/sdram_controller.sim/sim_1/behav/xsim
+# Command line       : vivado.exe -gui_launcher_event rodinguilauncherevent18064 F:\FPGA_Repos\sdram_controller\sdram_controller.sim\sim_1\behav\xsim\sdram_cmd_sequencer_tb_behav.wdb
+# Log file           : F:/FPGA_Repos/sdram_controller/sdram_controller.sim/sim_1/behav/xsim/vivado.log
+# Journal file       : F:/FPGA_Repos/sdram_controller/sdram_controller.sim/sim_1/behav/xsim\vivado.jou
+# Running On         : DESKTOP-QQS53RN
+# Platform           : Windows Server 2016 or Windows 10
+# Operating System   : 19045
+# Processor Detail   : AMD Ryzen 5 3600 6-Core Processor              
+# CPU Frequency      : 3600 MHz
+# CPU Physical cores : 6
+# CPU Logical cores  : 12
+# Host memory        : 34282 MB
+# Swap memory        : 8466 MB
+# Total Virtual      : 42749 MB
+# Available Virtual  : 23081 MB
+#-----------------------------------------------------------
+start_guioopen_wave_database {F:\FPGA_Repos\sdram_controller\sdram_controller.sim\sim_1\behav\xsim\sdram_cmd_sequencer_tb_behav.wdb}cclose_sim
