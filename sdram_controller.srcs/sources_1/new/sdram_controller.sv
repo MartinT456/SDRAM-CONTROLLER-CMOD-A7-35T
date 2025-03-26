@@ -113,10 +113,7 @@ module sdram_controller(
     always_comb begin
         next_state = state;
         case (state)
-            IDLE: begin
-                if (req_valid)
-                    next_state = ACTIVATE;
-            end
+            IDLE: if (req_valid) next_state = ACTIVATE;
             ACTIVATE: next_state = WAIT_TRCD;
             WAIT_TRCD: if (trcd_counter == 0) next_state = req_rw ? READ_BURST : WRITE_BURST;
             READ_BURST: if (burst_done) next_state = PRECHARGE;
