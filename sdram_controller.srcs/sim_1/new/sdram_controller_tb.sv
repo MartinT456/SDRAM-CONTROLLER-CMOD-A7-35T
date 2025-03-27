@@ -53,7 +53,9 @@ module sdram_controller_tb;
     // Bi-directional data line emulation
     logic [15:0] sdram_dq_driver;
     logic sdram_dq_drive_en;
+
     assign sdram_dq = sdram_dq_drive_en ? sdram_dq_driver : 16'bz;
+
 
     sdram_controller dut (
         .clk(clk),
@@ -70,10 +72,15 @@ module sdram_controller_tb;
         .sdram_addr(sdram_addr),
         .sdram_ba(sdram_ba),
         .a10_ap(a10_ap),
-        .sdram_dq(sdram_dq)
+        .sdram_dq(sdram_dq),
+        .test_burst_start(test_burst_start)
     );
 
     always #(CLK_PERIOD / 2) clk = ~clk;
+    
+        // Test signals
+    logic test_burst_start;
+    
 
     // reset
     task reset_dut();
@@ -103,7 +110,7 @@ module sdram_controller_tb;
             burst_len = len;
             repeat (1) @(posedge clk);
             req_valid = 0;
-            repeat(4) @(posedge clk); // Wait for active cycle and tRCD cycle to finish
+            repeat(5) @(posedge clk);
 
             repeat (len) begin
                 write_data = $random;
@@ -123,7 +130,7 @@ module sdram_controller_tb;
             repeat (1) @(posedge clk);
             req_valid = 0;
 
-            repeat (len + 2) begin // +2 for latency
+            repeat (len) begin // +2 for latency
                 sdram_dq_driver = $random;
                 sdram_dq_drive_en = 1;
                 @(posedge clk);

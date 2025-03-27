@@ -80,20 +80,31 @@ module sdram_controller(
     output logic [12:0] sdram_addr,
     output logic [1:0] sdram_ba,
     output logic a10_ap,
-    inout  logic [15:0] sdram_dq
+    inout  logic [15:0] sdram_dq,
+    
+    // Test signals
+    output logic test_burst_start
 );
 
     // Internal signals
-    logic burst_start, write_enable, read_enable, burst_done, cmd_req, op_mode;
+    logic burst_start, write_enable, read_enable, burst_done, cmd_req;
+    logic [3:0]  op_mode;
     logic [2:0] trcd_counter, twr_counter, trp_counter;
+    
+    // Test signals for simulation
+    always_comb begin
+        test_burst_start = burst_start;
+    end
 
     // FSM states
-    typedef enum logic [2:0] {
+    typedef enum logic [3:0] {
         IDLE,
         ACTIVATE,
         WAIT_TRCD,
         READ_BURST,
+        READ_PROCESS,
         WRITE_BURST,
+        WRITE_PROCESS,
         WAIT_TWR,
         PRECHARGE,
         WAIT_TRP
@@ -123,8 +134,8 @@ module sdram_controller(
     always_comb begin
         case (state)
             ACTIVATE: op_mode = CMD_ACTIVE;
-            READ_BURST: if (burst_start) op_mode = CMD_READ;
-            WRITE_BURST: if (burst_start) op_mode = CMD_WRITE;
+            READ_BURST: op_mode = CMD_READ;
+            WRITE_BURST: op_mode = CMD_WRITE;
             PRECHARGE: op_mode = CMD_PRECHARGE;
             default: op_mode = CMD_NOP;           
             
@@ -134,10 +145,10 @@ module sdram_controller(
     
     // FSM logic
     always_comb begin
-    
+        // Send a request to update cmd, will default to NOP 
         assign cmd_req = ((state == ACTIVATE) ||
-                  (state == READ_BURST  && burst_start) ||
-                  (state == WRITE_BURST && burst_start) ||
+                  (state == READ_BURST) ||
+                  (state == WRITE_BURST) ||
                   (state == PRECHARGE));
                   
         next_state = state;
@@ -152,9 +163,15 @@ module sdram_controller(
                 if (trcd_counter == 0) next_state = req_rw ? READ_BURST : WRITE_BURST;
             end
             READ_BURST: begin 
+                next_state = PRECHARGE;
+            end
+            READ_PROCESS: begin
                 if (burst_done) next_state = PRECHARGE;
             end
             WRITE_BURST: begin
+                next_state = WRITE_PROCESS;
+            end
+            WRITE_PROCESS: begin
                 if (burst_done) next_state = WAIT_TWR;
             end
             WAIT_TWR: begin
@@ -192,16 +209,26 @@ module sdram_controller(
                 WAIT_TRCD: begin // Row to column delay
                     if (trcd_counter > 0)
                         trcd_counter <= trcd_counter - 1;
-                end
+                    end
                 READ_BURST: begin
                     burst_start  <= 1; // start only once
                     read_enable  <= 1;
                 end
+                READ_PROCESS: begin
+                    burst_start <= 0;
+                    read_enable  <= 1;
+                    // TODO: implement CAS latency
+                end
                 WRITE_BURST: begin
                     burst_start  <= 1; // start only once
                     write_enable <= 1;
-                    if (burst_done)
-                        twr_counter <= 3'd2; // Example: tWR = 1 CLK + 6ns -> 2 clk cyclkes
+
+                end
+                WRITE_PROCESS: begin
+                    burst_start <= 0;
+                    write_enable <= 1;
+                    if (burst_done)  
+                        twr_counter <= 3'd2; // tWR = 1 CLK + 6ns -> 2 clk cycles                    
                 end
                 WAIT_TWR: begin // Write recovery time, allow SDRAM to finish writing
                     if (twr_counter > 0)
@@ -231,6 +258,7 @@ module sdram_controller(
         .addr(req_addr),
         .rw_mode(req_rw),
         .burst_len(burst_len),
+        .op_mode(op_mode),
         .sdram_cmd(sdram_cmd),
         .sdram_addr(sdram_addr),
         .sdram_ba(sdram_ba),

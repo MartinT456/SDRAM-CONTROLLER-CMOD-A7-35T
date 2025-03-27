@@ -6,3 +6,4 @@ INFO: [VRFC 10-2263] Analyzing SystemVerilog file "F:/FPGA_Repos/sdram_controlle
 INFO: [VRFC 10-311] analyzing module sdram_data_io
 INFO: [VRFC 10-2263] Analyzing SystemVerilog file "F:/FPGA_Repos/sdram_controller/sdram_controller.srcs/sim_1/new/sdram_controller_tb.sv" into library xil_defaultlib
 INFO: [VRFC 10-311] analyzing module sdram_controller_tb
+WARNING: [VRFC 10-2938] 'test_burst_start' is already implicitly declared on line 76 [F:/FPGA_Repos/sdram_controller/sdram_controller.srcs/sim_1/new/sdram_controller_tb.sv:82]

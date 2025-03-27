@@ -86,7 +86,8 @@ module sdram_data_io(
     logic dq_drive;  // 1 when writing
 
     // tri-state buffer control for writes
-    assign sdram_dq = (dq_drive && !rw_mode && write_enable) ? write_data : 16'bz;
+    //assign sdram_dq = (dq_drive && !rw_mode && write_enable) ? write_data : 16'bz;
+    assign sdram_dq = (!rw_mode && write_enable) ? write_data : 16'bz;
 
     // Logic for reading SDRAM
     always_ff @(posedge clk or negedge reset_n) begin
@@ -109,7 +110,7 @@ module sdram_data_io(
             burst_counter <= 3'd0;
             dq_drive <= 1'b0;
         end else if (burst_start) begin
-            burst_counter <= burst_len;
+            burst_counter <= burst_len - 1;
             dq_drive <= !rw_mode; // Enable drive only for write
         end else if (burst_counter > 0) begin
             if ((rw_mode && read_enable) || (!rw_mode && write_enable)) begin
@@ -118,9 +119,13 @@ module sdram_data_io(
                     dq_drive <= 1'b0; // Turn off drive on final cycle
                 end
             end
+        end else if (burst_counter == 0 && (read_enable || write_enable)) begin
+            burst_done <= 1;    
+        end else begin
+            burst_done <= 0;
         end
     end
 
-    assign burst_done = (burst_counter == 0);
+    //assign burst_done = (burst_counter == 0);
 
 endmodule

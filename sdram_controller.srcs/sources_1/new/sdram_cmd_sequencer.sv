@@ -54,7 +54,7 @@
 //----------------------------------------------------------------------
 // Revision History:
 //   [v1.0] - Initial version with basic command sequencing
-//
+//   [v1.1] - Re-implemented with purely combinational logic.
 //======================================================================
 
 
@@ -94,6 +94,7 @@ module sdram_cmd_sequencer(
     localparam CMD_REFRESH = 4'b0001; // Auto-Refresh (CS#=0, RAS#=0, CAS#=0, WE#=1)
     localparam CMD_LOAD_MODE = 4'b0000; // Load mode register (CS#=0, RAS#=0, CAS#=0, WE#=0)
     
+    /*
     typedef enum logic [1:0] {
         IDLE,
         ACTIVE,
@@ -117,42 +118,53 @@ module sdram_cmd_sequencer(
             IDLE: begin
                 if (cmd_req) next_state = ACTIVE;
             end
-            ACTIVE: begin
-            
-                if (cmd_req) next_state = READ_WRITE;
+            ACTIVE: begin          
+                next_state = READ_WRITE;
             end
             READ_WRITE: begin
-                if (cmd_req) next_state = PRECHARGE;
+                next_state = PRECHARGE;
             end
             PRECHARGE: begin
-                if (cmd_req) next_state = IDLE;
+                next_state = IDLE;
             end
         endcase
     end
+    */
 
     // Output Logic: Generating SDRAM Commands
     always_comb begin
         sdram_cmd  = CMD_NOP;   // Default NOP
         sdram_addr = 13'b0;
-        sdram_ba   = 2'b00;
-
-        case (state)
-            ACTIVE: begin
-                sdram_cmd  = CMD_ACTIVE;
-                sdram_addr = row_addr; // Send Row Address
-                sdram_ba   = bank_addr; // Select Bank
-            end
-            READ_WRITE: begin
-                sdram_cmd  = rw_mode ? CMD_READ : CMD_WRITE;
-                sdram_addr = {4'b0000, col_addr}; // Column Address
-                sdram_ba   = bank_addr;
-                a10_ap     = addr[0]; // Auto-precharge control
-            end
-            PRECHARGE: begin
-                sdram_cmd  = CMD_PRECHARGE;
-                sdram_addr = 13'b0010000000000; // Precharge all banks
-            end
-        endcase
+        sdram_ba = 2'b00;
+        a10_ap = 1'b0;
+        if (cmd_req) begin
+            case (op_mode)
+                CMD_ACTIVE: begin
+                    sdram_cmd = CMD_ACTIVE;
+                    sdram_addr = row_addr; // Send Row Address
+                    sdram_ba = bank_addr; // Select Bank
+                end
+                CMD_READ: begin
+                    sdram_cmd = CMD_READ;
+                    sdram_addr = {4'b0000, col_addr}; // Column Address
+                    sdram_ba = bank_addr;
+                    a10_ap = addr[0]; // Auto-precharge control
+                end
+                CMD_WRITE: begin
+                    sdram_cmd = CMD_WRITE;
+                    sdram_addr = {4'b0000, col_addr}; // Column Address
+                    sdram_ba = bank_addr;
+                    a10_ap = addr[0]; // Auto-precharge control
+                end
+                CMD_PRECHARGE: begin
+                    sdram_cmd = CMD_PRECHARGE;
+                    sdram_addr = 13'b0010000000000; // Precharge all banks
+                end
+                default: begin
+                    sdram_cmd = CMD_NOP;
+                end
+            endcase
+        end
     end
     
 endmodule
