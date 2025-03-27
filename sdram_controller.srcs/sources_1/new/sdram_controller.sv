@@ -109,21 +109,54 @@ module sdram_controller(
             state <= next_state;
     end
 
+    // SDRAM command encoding (Table 14: Truth Table)
+    localparam CMD_NOP = 4'b0111; // No operation (CS#=0, RAS#=1, CAS#=1, WE#=1)
+    localparam CMD_ACTIVE = 4'b0011; // Activate row (CS#=0, RAS#=0, CAS#=1, WE#=1)
+    localparam CMD_READ = 4'b0101; // Read column (CS#=0, RAS#=1, CAS#=0, WE#=1)
+    localparam CMD_WRITE = 4'b0100; // Write column (CS#=0, RAS#=1, CAS#=0, WE#=0)
+    localparam CMD_PRECHARGE = 4'b0010; // Precharge row (CS#=0, RAS#=0, CAS#=1, WE#=0)
+    localparam CMD_REFRESH = 4'b0001; // Auto-Refresh (CS#=0, RAS#=0, CAS#=0, WE#=1)
+    localparam CMD_LOAD_MODE = 4'b0000; // Load mode register (CS#=0, RAS#=0, CAS#=0, WE#=0)
+    
     // FSM logic
     always_comb begin
         next_state = state;
         case (state)
-            IDLE: if (req_valid) next_state = ACTIVATE;
-            ACTIVATE: next_state = WAIT_TRCD;
-            WAIT_TRCD: if (trcd_counter == 0) next_state = req_rw ? READ_BURST : WRITE_BURST;
-            READ_BURST: if (burst_done) next_state = PRECHARGE;
-            WRITE_BURST:if (burst_done) next_state = WAIT_TWR;
-            WAIT_TWR: if (twr_counter == 0) next_state = PRECHARGE;
-            PRECHARGE: next_state = WAIT_TRP;
-            WAIT_TRP: if (trp_counter == 0)  next_state = IDLE;
+            IDLE: begin 
+                sdram_cmd = CMD_NOP;
+                if (req_valid) next_state = ACTIVATE;              
+            end
+            ACTIVATE: begin
+                sdram_cmd = CMD_ACTIVE;
+                next_state = WAIT_TRCD;
+            end
+            WAIT_TRCD: begin
+                sdram_cmd = CMD_NOP;
+                if (trcd_counter == 0) next_state = req_rw ? READ_BURST : WRITE_BURST;
+            end
+            READ_BURST: begin 
+                sdram_cmd = CMD_READ;
+                if (burst_done) next_state = PRECHARGE;
+            end
+            WRITE_BURST: begin
+                sdram_cmd = CMD_WRITE;
+                if (burst_done) next_state = WAIT_TWR;
+            end
+            WAIT_TWR: begin
+                sdram_cmd = CMD_NOP;
+                if (twr_counter == 0) next_state = PRECHARGE;
+            end
+            PRECHARGE: begin
+                sdram_cmd = CMD_PRECHARGE;
+                next_state = WAIT_TRP;
+            end
+            WAIT_TRP: begin
+                sdram_cmd = CMD_NOP;
+                if (trp_counter == 0)  next_state = IDLE;
+            end
         endcase
     end
-
+    
     // Control logic and counters
     always_ff @(posedge clk or negedge reset_n) begin
         if (!reset_n) begin

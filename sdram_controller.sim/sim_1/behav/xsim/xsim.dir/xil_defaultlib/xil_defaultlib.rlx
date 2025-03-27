@@ -4,6 +4,8 @@ Nov  8 2024
 22:36:57
 F:/FPGA_Repos/sdram_controller/sdram_controller.sim/sim_1/behav/xsim/glbl.v,1724786425,verilog,,,,glbl,,uvm,,,,,,
 F:/FPGA_Repos/sdram_controller/sdram_controller.srcs/sim_1/new/sdram_cmd_sequencer_tb.sv,1742755209,systemVerilog,,,,sdram_cmd_sequencer_tb,,uvm,,,,,,
+F:/FPGA_Repos/sdram_controller/sdram_controller.srcs/sim_1/new/sdram_controller_tb.sv,1743085327,systemVerilog,,,,sdram_controller_tb,,uvm,,,,,,
 F:/FPGA_Repos/sdram_controller/sdram_controller.srcs/sim_1/new/sdram_data_io_tb.sv,1742808578,systemVerilog,,,,sdram_data_io_tb,,uvm,,,,,,
-F:/FPGA_Repos/sdram_controller/sdram_controller.srcs/sources_1/new/sdram_cmd_sequencer.sv,1742754275,systemVerilog,,F:/FPGA_Repos/sdram_controller/sdram_controller.srcs/sim_1/new/sdram_cmd_sequencer_tb.sv,,sdram_cmd_sequencer,,uvm,,,,,,
-F:/FPGA_Repos/sdram_controller/sdram_controller.srcs/sources_1/new/sdram_data_io.sv,1742808668,systemVerilog,,F:/FPGA_Repos/sdram_controller/sdram_controller.srcs/sim_1/new/sdram_data_io_tb.sv,,sdram_data_io,,uvm,,,,,,
+F:/FPGA_Repos/sdram_controller/sdram_controller.srcs/sources_1/new/sdram_cmd_sequencer.sv,1743084149,systemVerilog,,F:/FPGA_Repos/sdram_controller/sdram_controller.srcs/sources_1/new/sdram_controller.sv,,sdram_cmd_sequencer,,uvm,,,,,,
+F:/FPGA_Repos/sdram_controller/sdram_controller.srcs/sources_1/new/sdram_controller.sv,1743084720,systemVerilog,,F:/FPGA_Repos/sdram_controller/sdram_controller.srcs/sources_1/new/sdram_data_io.sv,,sdram_controller,,uvm,,,,,,
+F:/FPGA_Repos/sdram_controller/sdram_controller.srcs/sources_1/new/sdram_data_io.sv,1742808668,systemVerilog,,F:/FPGA_Repos/sdram_controller/sdram_controller.srcs/sim_1/new/sdram_controller_tb.sv,,sdram_data_io,,uvm,,,,,,

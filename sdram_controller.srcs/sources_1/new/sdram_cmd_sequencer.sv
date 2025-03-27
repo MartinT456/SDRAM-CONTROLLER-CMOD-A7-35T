@@ -63,7 +63,7 @@ module sdram_cmd_sequencer(
     input logic cmd_req, // External request for cmd execution
     input logic [24:0] addr,  // Address: [24:12] row, [11:3] col, [2:1] bank
     input logic rw_mode, // read = 1, write = 0
-    input logic [2:0] burst_len, // Burst length
+    input logic [2:0] burst_len, // Burst length, don't actually need this right now
     
     output logic [3:0] sdram_cmd,
     output logic [12:0] sdram_addr, // row/col address

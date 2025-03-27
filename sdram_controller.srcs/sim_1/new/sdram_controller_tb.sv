@@ -129,6 +129,24 @@ module sdram_controller_tb;
             end
             sdram_dq_drive_en = 0;
         end
+        
+        /*
+         $display("\n[Test] Write Burst");
+        rw_mode = 0;  // write
+        burst_len = BURST_LEN;
+        @(posedge clk);
+        burst_start = 1;
+
+        repeat (BURST_LEN) begin
+            write_enable = 1;
+            write_data   = $random;
+            @(posedge clk);
+            burst_start = 0;
+        end
+        @(posedge clk);
+        write_enable = 0;
+        wait (burst_done);
+        */
     endtask
 
     // test
