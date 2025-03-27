@@ -6,16 +6,26 @@
 // Design Name: 
 // Module Name: sdram_controller_tb
 // Project Name: 
-// Target Devices: 
+// Target Devices: CMOD A7-35T
 // Tool Versions: 
+// 
 // Description: 
-// 
-// Dependencies: 
-// 
-// Revision:
-// Revision 0.01 - File Created
-// Additional Comments:
-// 
+//   SystemVerilog testbench for the SDRAM controller module.
+//   This testbench verifies correct behavior of burst READ and WRITE 
+//   transactions with appropriate handling of SDRAM timing constraints 
+//   (tRCD, tWR, tRP). It includes:
+//     - Clock and reset generation
+//     - Bidirectional `sdram_dq` emulation
+//     - Tasks for performing burst read/write requests
+//     - Simulation of SDRAM responses during read
+//     - Live monitoring of signals using $monitor
+//
+// Test Flow:
+//   1. Apply reset to DUT
+//   2. Perform a WRITE burst of 4 words to a given address
+//   3. Perform a READ burst of 4 words from the same address
+//   4. Display output waveforms and signal activity for debugging
+//
 //////////////////////////////////////////////////////////////////////////////////
 
 module sdram_controller_tb;
