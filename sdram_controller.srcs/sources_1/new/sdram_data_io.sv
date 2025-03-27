@@ -8,13 +8,10 @@
 // Project Name: 
 // Target Devices: 
 // Tool Versions: 
-// Description: 
 // 
 //
 // File:        sdram_data_io.sv
 // Description: SDRAM Data I/O Module for MT48LC16M16A2P-6A:G
-// Author:      [Your Name]
-// Created:     [Date]
 //
 // Purpose:
 // This module manages the bidirectional 16-bit data bus (`sdram_dq`) between 

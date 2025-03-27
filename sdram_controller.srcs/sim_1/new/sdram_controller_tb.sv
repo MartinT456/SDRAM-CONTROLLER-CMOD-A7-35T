@@ -103,6 +103,7 @@ module sdram_controller_tb;
             burst_len = len;
             repeat (1) @(posedge clk);
             req_valid = 0;
+            repeat(4) @(posedge clk); // Wait for active cycle and tRCD cycle to finish
 
             repeat (len) begin
                 write_data = $random;
@@ -151,6 +152,7 @@ module sdram_controller_tb;
 
     // test
     initial begin
+        
         $display("Starting SDRAM Controller Testbench");
         reset_dut();
 

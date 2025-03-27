@@ -84,7 +84,7 @@ module sdram_controller(
 );
 
     // Internal signals
-    logic burst_start, write_enable, read_enable, burst_done;
+    logic burst_start, write_enable, read_enable, burst_done, cmd_req, op_mode;
     logic [2:0] trcd_counter, twr_counter, trp_counter;
 
     // FSM states
@@ -103,8 +103,9 @@ module sdram_controller(
 
     // FSM state transition
     always_ff @(posedge clk or negedge reset_n) begin
-        if (!reset_n)
+        if (!reset_n) begin
             state <= IDLE;
+        end
         else
             state <= next_state;
     end
@@ -118,40 +119,51 @@ module sdram_controller(
     localparam CMD_REFRESH = 4'b0001; // Auto-Refresh (CS#=0, RAS#=0, CAS#=0, WE#=1)
     localparam CMD_LOAD_MODE = 4'b0000; // Load mode register (CS#=0, RAS#=0, CAS#=0, WE#=0)
     
+    // op_mode logic
+    always_comb begin
+        case (state)
+            ACTIVATE: op_mode = CMD_ACTIVE;
+            READ_BURST: if (burst_start) op_mode = CMD_READ;
+            WRITE_BURST: if (burst_start) op_mode = CMD_WRITE;
+            PRECHARGE: op_mode = CMD_PRECHARGE;
+            default: op_mode = CMD_NOP;           
+            
+        endcase
+    end
+    
+    
     // FSM logic
     always_comb begin
+    
+        assign cmd_req = ((state == ACTIVATE) ||
+                  (state == READ_BURST  && burst_start) ||
+                  (state == WRITE_BURST && burst_start) ||
+                  (state == PRECHARGE));
+                  
         next_state = state;
         case (state)
             IDLE: begin 
-                sdram_cmd = CMD_NOP;
                 if (req_valid) next_state = ACTIVATE;              
             end
             ACTIVATE: begin
-                sdram_cmd = CMD_ACTIVE;
                 next_state = WAIT_TRCD;
             end
             WAIT_TRCD: begin
-                sdram_cmd = CMD_NOP;
                 if (trcd_counter == 0) next_state = req_rw ? READ_BURST : WRITE_BURST;
             end
             READ_BURST: begin 
-                sdram_cmd = CMD_READ;
                 if (burst_done) next_state = PRECHARGE;
             end
             WRITE_BURST: begin
-                sdram_cmd = CMD_WRITE;
                 if (burst_done) next_state = WAIT_TWR;
             end
             WAIT_TWR: begin
-                sdram_cmd = CMD_NOP;
                 if (twr_counter == 0) next_state = PRECHARGE;
             end
             PRECHARGE: begin
-                sdram_cmd = CMD_PRECHARGE;
                 next_state = WAIT_TRP;
             end
             WAIT_TRP: begin
-                sdram_cmd = CMD_NOP;
                 if (trp_counter == 0)  next_state = IDLE;
             end
         endcase
@@ -182,11 +194,11 @@ module sdram_controller(
                         trcd_counter <= trcd_counter - 1;
                 end
                 READ_BURST: begin
-                    burst_start  <= (burst_done == 0); // start only once
+                    burst_start  <= 1; // start only once
                     read_enable  <= 1;
                 end
                 WRITE_BURST: begin
-                    burst_start  <= (burst_done == 0); // start only once
+                    burst_start  <= 1; // start only once
                     write_enable <= 1;
                     if (burst_done)
                         twr_counter <= 3'd2; // Example: tWR = 1 CLK + 6ns -> 2 clk cyclkes
@@ -215,7 +227,7 @@ module sdram_controller(
     sdram_cmd_sequencer cmd_seq (
         .clk(clk),
         .reset_n(reset_n),
-        .cmd_req(burst_start),
+        .cmd_req(cmd_req),
         .addr(req_addr),
         .rw_mode(req_rw),
         .burst_len(burst_len),

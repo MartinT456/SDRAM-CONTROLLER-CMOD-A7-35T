@@ -34,6 +34,7 @@
 //   addr        : 25-bit SDRAM address (row/col/bank/A10)
 //   rw_mode     : 1 = read, 0 = write
 //   burst_len   : Burst length (not yet implemented)
+//   op-mode     : Signal from top-level controller indicating current operational mode
 //
 // Outputs:
 //   sdram_cmd   : 4-bit command code for SDRAM control signals
@@ -64,6 +65,7 @@ module sdram_cmd_sequencer(
     input logic [24:0] addr,  // Address: [24:12] row, [11:3] col, [2:1] bank
     input logic rw_mode, // read = 1, write = 0
     input logic [2:0] burst_len, // Burst length, don't actually need this right now
+    input logic [3:0] op_mode, // Command selector coming from top-level controller
     
     output logic [3:0] sdram_cmd,
     output logic [12:0] sdram_addr, // row/col address
@@ -113,17 +115,17 @@ module sdram_cmd_sequencer(
         next_state = state;
         case (state)
             IDLE: begin
-                if (cmd_req)
-                    next_state = ACTIVE;
+                if (cmd_req) next_state = ACTIVE;
             end
             ACTIVE: begin
-                next_state = READ_WRITE;
+            
+                if (cmd_req) next_state = READ_WRITE;
             end
             READ_WRITE: begin
-                next_state = PRECHARGE;
+                if (cmd_req) next_state = PRECHARGE;
             end
             PRECHARGE: begin
-                next_state = IDLE;
+                if (cmd_req) next_state = IDLE;
             end
         endcase
     end
